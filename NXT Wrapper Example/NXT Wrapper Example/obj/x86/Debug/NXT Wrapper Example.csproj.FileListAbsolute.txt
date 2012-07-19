@@ -1,5 +1,0 @@
-C:\Users\Pete\Lego-NXT-Wrapper\NXT Wrapper Example\NXT Wrapper Example\bin\Debug\NXT Wrapper Example.exe
-C:\Users\Pete\Lego-NXT-Wrapper\NXT Wrapper Example\NXT Wrapper Example\bin\Debug\NXT Wrapper Example.pdb
-C:\Users\Pete\Lego-NXT-Wrapper\NXT Wrapper Example\NXT Wrapper Example\obj\x86\Debug\ResolveAssemblyReference.cache
-C:\Users\Pete\Lego-NXT-Wrapper\NXT Wrapper Example\NXT Wrapper Example\obj\x86\Debug\NXT Wrapper Example.exe
-C:\Users\Pete\Lego-NXT-Wrapper\NXT Wrapper Example\NXT Wrapper Example\obj\x86\Debug\NXT Wrapper Example.pdb
