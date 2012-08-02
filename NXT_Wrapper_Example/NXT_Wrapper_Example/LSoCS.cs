@@ -233,11 +233,12 @@ namespace LSoCS
             }
         }
 
-        public class CDeviceInfo
+        public class CDeviceInfo : Error_Checking
         {
             byte[] device_info;
 
             CSerialPort serial_port;
+            byte[] reply;
 
             public CDeviceInfo(CSerialPort serial_port)
             {
@@ -460,7 +461,9 @@ namespace LSoCS
         public class OutPort : Error_Checking
         {
             CSerialPort serial_port;
-            MotorPort motor_port; 
+            MotorPort motor_port;
+            string returnMessage = "";
+            byte[] reply; 
             
             public OutPort(CSerialPort serial_port, MotorPort motor_port)
             {
@@ -912,11 +915,13 @@ namespace LSoCS
             private string comPort;
             CSerialPort serial_port;
             public CDeviceInfo DeviceInfo;
+            
             // All inports of the NXT 1-4
             public InPort InPort1,
                           InPort2,
                           InPort3,
                           InPort4;
+
             // All outports for the NXT A, B, C
             public OutPort  OutPortA,
                             OutPortB,
@@ -925,13 +930,15 @@ namespace LSoCS
             
             
             //flag for connectivity 
-            bool connected = false;
+            public bool connected { get; protected set; }
+            
 
             public Details Info;
             public Direct_Commands DirectCommands;
 
             public Robot(string ComPort)
             {
+                connected = false;
                 Connect(ComPort);
             }
 
@@ -1010,7 +1017,10 @@ namespace LSoCS
             /// <param name="speed"></param>
             public void GoForward(uint speed)
             {
-                
+                speed = (speed > 100) ?100:speed;
+
+                OutPortB.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
+                OutPortC.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);    
             }
 
             /// <summary>
@@ -1018,10 +1028,32 @@ namespace LSoCS
             /// </summary>
             /// <param name="speed"></param>
             public void GoBackwards(uint speed)
-            { }
+            {
+                OutPortB.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
+                OutPortC.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running); 
+            }
 
-            public void Turn(int degrees, uint speed)
-            { }
+            /// <summary>
+            /// Turn right using ports B, C
+            /// </summary>
+            /// <param name="degrees"></param>
+            /// <param name="speed"></param>
+            public void TurnRight(int degrees, uint speed)
+            {
+                OutPortB.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
+                OutPortC.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running); 
+            }
+
+            /// <summary>
+            /// Turn left using ports B, C
+            /// </summary>
+            /// <param name="degrees"></param>
+            /// <param name="speed"></param>
+            public void TurnLeft(int degrees, uint speed)
+            {
+                OutPortB.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
+                OutPortC.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
+            }
         }
     }
 }
