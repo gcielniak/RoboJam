@@ -964,6 +964,9 @@ namespace LSoCS
                 InPort3 = new InPort(serial_port, 2);
                 InPort4 = new InPort(serial_port, 3);
 
+                OutPortA = new OutPort(serial_port, MotorPort.MotorA);
+                OutPortB = new OutPort(serial_port, MotorPort.MotorB);
+                OutPortC = new OutPort(serial_port, MotorPort.MotorC);
 
                 comPort = port_name;
 
