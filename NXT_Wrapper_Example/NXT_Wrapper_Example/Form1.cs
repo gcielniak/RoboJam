@@ -6,14 +6,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using LSoCS.NXT;
+using NXT;
 
 namespace Lego_Colour_Detection
 {
     public partial class Form1 : Form
     {
 
-        LSoCS.NXT.Robot NXT_Brick;
+        NXT.Robot NXT_Brick;
         string response = "";
 
         
@@ -62,19 +62,19 @@ namespace Lego_Colour_Detection
             NXT_Brick = null;
 
             cmb_Motor.Items.Clear();
-            cmb_Motor.Items.AddRange(Enum.GetNames(typeof(LSoCS.NXT.MotorPort)));
+            cmb_Motor.Items.AddRange(Enum.GetNames(typeof(NXT.MotorPort)));
             cmb_Motor.SelectedIndex = 0;
 
             cmb_Mode.Items.Clear();
-            cmb_Mode.Items.AddRange(Enum.GetNames(typeof(LSoCS.NXT.Mode)));
+            cmb_Mode.Items.AddRange(Enum.GetNames(typeof(NXT.Mode)));
             cmb_Mode.SelectedIndex = 0;
 
             cmb_RegMode.Items.Clear();
-            cmb_RegMode.Items.AddRange(Enum.GetNames(typeof(LSoCS.NXT.RegulationMode)));
+            cmb_RegMode.Items.AddRange(Enum.GetNames(typeof(NXT.RegulationMode)));
             cmb_RegMode.SelectedIndex = 0;
 
             cmb_RunState.Items.Clear();
-            cmb_RunState.Items.AddRange(Enum.GetNames(typeof(LSoCS.NXT.RunState)));
+            cmb_RunState.Items.AddRange(Enum.GetNames(typeof(NXT.RunState)));
             cmb_RunState.SelectedIndex = 0;
         }
 
@@ -157,10 +157,10 @@ namespace Lego_Colour_Detection
             if (selectedPort.ContainsKey(key))
             {
                 selectedPort[key].SetOutputState((int)num_Speed.Value,
-                                               (LSoCS.NXT.Mode)Enum.Parse(typeof(LSoCS.NXT.Mode), cmb_Mode.SelectedItem.ToString()),
-                                               (LSoCS.NXT.RegulationMode)Enum.Parse(typeof(LSoCS.NXT.RegulationMode), cmb_RegMode.SelectedItem.ToString()),
+                                               (NXT.Mode)Enum.Parse(typeof(NXT.Mode), cmb_Mode.SelectedItem.ToString()),
+                                               (NXT.RegulationMode)Enum.Parse(typeof(NXT.RegulationMode), cmb_RegMode.SelectedItem.ToString()),
                                                (int)num_Turn.Value,
-                                               (LSoCS.NXT.RunState)Enum.Parse(typeof(LSoCS.NXT.RunState), cmb_RunState.SelectedItem.ToString()));
+                                               (NXT.RunState)Enum.Parse(typeof(NXT.RunState), cmb_RunState.SelectedItem.ToString()));
             }
 
         }

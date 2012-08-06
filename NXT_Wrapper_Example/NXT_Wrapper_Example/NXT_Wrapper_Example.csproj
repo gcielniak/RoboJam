@@ -34,9 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LSoCS, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Google Drive\2012\Robots\NXT\Wrapper\LSoCS\LSoCS\bin\Debug\LSoCS.dll</HintPath>
+    <Reference Include="NXT">
+      <HintPath>..\..\Wrapper\NXT.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
