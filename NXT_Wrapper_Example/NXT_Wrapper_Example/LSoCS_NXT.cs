@@ -1,10 +1,9 @@
 ﻿using System;
+using System.IO.Ports;
+using System.Threading;
 
-namespace NXT
+namespace LSoCS_NXT
 {
-    using System.IO.Ports;
-    using System.Threading;
-
     public enum SonarRegister : byte
     {
         MeasurementUnits = 0x14,
@@ -232,12 +231,10 @@ namespace NXT
         }
     }
 
-    public class CDeviceInfo : Error_Checking
+    public class CDeviceInfo
     {
         byte[] device_info;
-
         CSerialPort serial_port;
-        byte[] reply;
 
         public CDeviceInfo(CSerialPort serial_port)
         {
@@ -305,51 +302,10 @@ namespace NXT
             get
             {
                 Update();
-                return (uint)(device_info[26] | (device_info[27] << 8) | (device_info[28]) | (device_info[29]));
+                return (uint)(device_info[26] | (device_info[27]<<8) | (device_info[28] ) | (device_info[29] ));
             }
         }
 
-        public string FirmwareVersion
-        {
-            get
-            {
-                string Firmware = "";
-
-                byte[] message = new byte[2];
-
-                message[0] = 0x01;
-                message[1] = 0x88;
-
-                serial_port.Send(message, ref reply);
-
-                if (CheckResponce(ref reply[2]) != "Success")
-                    return CheckResponce(ref message[2]);
-
-                Firmware = reply[6] + "." + reply[5];
-                return Firmware;
-            }
-        }
-
-        public string ProtocolVersion
-        {
-            get
-            {
-                string Protocol = "";
-                byte[] message = new byte[2];
-
-                message[0] = 0x01;
-                message[1] = 0x88;
-
-                serial_port.Send(message, ref reply);
-
-                if (CheckResponce(ref reply[2]) != "Success")
-                    return CheckResponce(ref message[2]);
-
-                Protocol = reply[4] + "." + reply[3];
-                return Protocol;
-            }
-
-        }
     }
 
     public class InPort
@@ -423,6 +379,11 @@ namespace NXT
             return true;
         }
 
+        public void Print()
+        {
+            Console.WriteLine("RawAD {0:d4}, ScaledAD {1:d4}, Scaled {2:d4}, Calibrated {3:d4}", RawADValue, ScaledADValue, ScaledValue, CalibratedValue);
+        }
+
         public ushort RawADValue
         {
             get
@@ -455,97 +416,6 @@ namespace NXT
             }
         }
 
-    }
-
-    public class OutPort : Error_Checking
-    {
-        CSerialPort serial_port;
-        MotorPort motor_port;
-        string returnMessage = "";
-        byte[] reply;
-
-        public OutPort(CSerialPort serial_port, MotorPort motor_port)
-        {
-            this.serial_port = serial_port;
-            this.motor_port = motor_port;
-        }
-
-        public string SetOutputState(int speed, Mode mode, RegulationMode regMode, int turnRatio, RunState runState)
-        {
-
-            byte[] message = new byte[13];  // message to be sent          
-
-            // Populate message
-            message[0] = 0x00;                  // Feedback required
-            message[1] = (byte)DirectCommand.SetOutputState;
-            message[2] = (byte)motor_port;           // output port
-            message[3] = (byte)speed;           // power set point 
-            message[4] = (byte)mode;            // mode byte
-            message[5] = (byte)regMode;         // reg mode
-            message[6] = (byte)turnRatio;       //turn ratio 
-            message[7] = (byte)runState;        //run state
-
-            //figure something out with this - make programmerable 
-            message[8] = 0x00;                      //tacho limit
-            message[9] = 0x00;
-            message[10] = 0x00;
-            message[11] = 0x00;
-            message[12] = 0x00;
-
-
-
-            // Send message
-            serial_port.Send(message, ref reply);
-            if(reply != null)
-                returnMessage = CheckResponce(ref reply[2]);
-
-
-            return returnMessage;
-
-        }
-
-        public string GetOutputState()
-        {
-            byte[] message = new byte[3];
-
-            message[0] = 0x00;
-            message[1] = (byte)DirectCommand.GetOutputState;
-            message[2] = (byte)motor_port;
-
-            serial_port.Send(message, ref reply);
-
-            returnMessage = "";
-            if (reply == null)
-                return "";
-
-            for (int i = 0; i < 25; i++)
-            {
-                returnMessage += Convert.ToUInt32(reply[i]) + " : ";
-            }
-
-
-            returnMessage += ";";
-
-
-            return returnMessage;
-        }
-
-        public string ResetMotorPosition(bool AbsolutePosition)
-        {
-            byte[] message = new byte[4];
-
-            message[0] = 0x00;
-            message[1] = 0x0A;
-            message[2] = (byte)motor_port;
-            message[3] = 0;
-
-            serial_port.Send(message, ref reply);
-
-
-            returnMessage = CheckResponce(ref reply[2]);
-
-            return returnMessage;
-        }
     }
 
     public class Commands
@@ -719,6 +589,49 @@ namespace NXT
         {
             this.serial_port = serial_port;
         }
+
+
+        public string FirmwareVersion
+        {
+            get
+            {
+                string Firmware = "";
+
+                byte[] message = new byte[2];
+
+                message[0] = 0x01;
+                message[1] = 0x88;
+
+                serial_port.Send(message, ref reply);
+
+                if (CheckResponce(ref reply[2]) != "Success")
+                    return CheckResponce(ref message[2]);
+
+                Firmware = reply[6] + "." + reply[5];
+                return Firmware;
+            }
+        }
+
+        public string ProtocolVersion
+        {
+            get 
+            {
+                string Protocol = "";
+                byte[] message = new byte[2];
+
+                message[0] = 0x01;
+                message[1] = 0x88;
+
+                serial_port.Send(message, ref reply);
+
+                if (CheckResponce(ref reply[2]) != "Success")
+                    return CheckResponce(ref message[2]);
+
+                Protocol = reply[4] + "." + reply[3];
+                return Protocol;
+            }
+        
+        }
     }
 
     public class Direct_Commands : Error_Checking
@@ -835,6 +748,80 @@ namespace NXT
 
         }
 
+        public string SetOutputState(MotorPort motor, int speed, Mode mode, RegulationMode regMode, int turnRatio, RunState runState)
+        {
+
+            byte[] message = new byte[13];  // message to be sent          
+
+            // Populate message
+            message[0] = 0x00;                  // Feedback required
+            message[1] = (byte)DirectCommand.SetOutputState;
+            message[2] = (byte)motor;           // output port
+            message[3] = (byte)speed;           // power set point 
+            message[4] = (byte)mode;            // mode byte
+            message[5] = (byte)regMode;         // reg mode
+            message[6] = (byte)turnRatio;       //turn ratio 
+            message[7] = (byte)runState;        //run state
+
+            //figure something out with this - make programmerable 
+            message[8] = 0x00;                      //tacho limit
+            message[9] = 0x00;
+            message[10] = 0x00;
+            message[11] = 0x00;
+            message[12] = 0x00;
+
+
+
+            // Send message
+            serial_port.Send(message, ref reply);
+            returnMessage = CheckResponce(ref reply[2]);
+            return returnMessage;
+
+        }
+
+        public string GetOutputState(MotorPort Motor)
+        {
+            byte[] message = new byte[3];
+
+            message[0] = 0x00;
+            message[1] = (byte)DirectCommand.GetOutputState;
+            message[2] = (byte)Motor;
+
+            serial_port.Send(message, ref reply);
+
+            returnMessage = "";
+            if (reply == null)
+                return ""; 
+
+            for (int i = 0; i < 25; i++)
+            {
+                returnMessage += Convert.ToUInt32(reply[i]) + " : ";
+            }
+
+
+            returnMessage += ";";
+
+
+            return returnMessage;
+        }
+
+        public string ResetMotorPosition(MotorPort Motor, bool AbsolutePosition)
+        {
+            byte[] message = new byte[4];
+
+            message[0] = 0x00;
+            message[1] = 0x0A;
+            message[2] = (byte)Motor;
+            message[3] = 0;
+
+            serial_port.Send(message, ref reply);
+
+
+            returnMessage = CheckResponce(ref reply[2]);
+
+            return returnMessage;
+        }
+
         public string GetBatteryLevel()
         {
             byte[] message = new byte[2];
@@ -873,7 +860,7 @@ namespace NXT
 
             returnMessage = CheckResponce(ref reply[2]);
 
-            return returnMessage;
+            return returnMessage; 
         }
 
         public string CurrentProgram()
@@ -897,9 +884,9 @@ namespace NXT
         {
             byte[] message = new byte[18];
             System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
-            byte[] newName = encoding.GetBytes(NewName);
+            byte[] newName = encoding.GetBytes(NewName); 
 
-            message[0] = 0x01;
+            message[0] = 0x01 ; 
             message[1] = (byte)Command.SetBrickName;
 
             newName.CopyTo(message, 2);
@@ -908,41 +895,34 @@ namespace NXT
 
             returnMessage = CheckResponce(ref reply[2]);
 
-            return returnMessage;
+            return returnMessage; 
         }
     }
 
     public class Robot
     {
-        private string comPort;
-        CSerialPort serial_port;
         public CDeviceInfo DeviceInfo;
-
-        // All inports of the NXT 1-4
         public InPort InPort1,
                       InPort2,
                       InPort3,
                       InPort4;
 
-        // All outports for the NXT A, B, C
-        public OutPort OutPortA,
-                        OutPortB,
-                        OutPortC,
-                        OutPortAll;
-
-
-
+        private string comPort;
+        CSerialPort serial_port;
         //flag for connectivity 
-        public bool connected { get; protected set; }
-
+        bool connected = false;
 
         public Details Info;
         public Direct_Commands DirectCommands;
 
         public Robot(string ComPort)
         {
-            connected = false;
             Connect(ComPort);
+        }
+
+        public Robot()
+        {
+            // do nothing 
         }
 
         ~Robot()
@@ -951,11 +931,7 @@ namespace NXT
             if (connected)
                 serial_port.Disconnect();
         }
-        /// <summary>
-        /// Will try and connect to a specific ComPort
-        /// </summary>
-        /// <param name="port_name"></param>
-        /// <returns></returns>
+
         public bool Connect(string port_name)
         {
             serial_port = new CSerialPort();
@@ -967,10 +943,6 @@ namespace NXT
             InPort3 = new InPort(serial_port, 2);
             InPort4 = new InPort(serial_port, 3);
 
-            OutPortA = new OutPort(serial_port, MotorPort.MotorA);
-            OutPortB = new OutPort(serial_port, MotorPort.MotorB);
-            OutPortC = new OutPort(serial_port, MotorPort.MotorC);
-            OutPortAll = new OutPort(serial_port, MotorPort.MotorAll); 
 
             comPort = port_name;
 
@@ -990,10 +962,6 @@ namespace NXT
             return true;
         }
 
-        /// <summary>
-        /// Will try and Automatical find the correct ComPort to connect to
-        /// </summary>
-        /// <returns></returns>
         public bool AutoConnect()
         {
             foreach (string port_name in SerialPort.GetPortNames())
@@ -1008,9 +976,6 @@ namespace NXT
             return false;
         }
 
-        /// <summary>
-        /// Disconnect from ComPort
-        /// </summary>
         public void Disconnect()
         {
 
@@ -1018,68 +983,6 @@ namespace NXT
             connected = false;
         }
 
-        /// <summary>
-        /// Move forward using ports B, C
-        /// </summary>
-        /// <param name="speed"></param>
-        public void GoForward(uint speed)
-        {
-            speed = (speed > 100) ? 100 : speed;
 
-            OutPortB.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-            OutPortC.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-        }
-
-        /// <summary>
-        /// Move backwards using ports B, C
-        /// </summary>
-        /// <param name="speed"></param>
-        public void GoBackwards(uint speed)
-        {
-            OutPortB.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-            OutPortC.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-        }
-
-        /// <summary>
-        /// Turn right using ports B, C
-        /// </summary>
-        /// <param name="degrees"></param>
-        /// <param name="speed"></param>
-        public void TurnRight(uint speed)
-        {
-            OutPortB.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-            OutPortC.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-        }
-
-        /// <summary>
-        /// Turn left using ports B, C
-        /// </summary>
-        /// <param name="degrees"></param>
-        /// <param name="speed"></param>
-        public void TurnLeft(uint speed)
-        {
-            OutPortB.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-            OutPortC.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-        }
-
-        /// <summary>
-        /// Stop the NXT from moving
-        /// </summary>
-        public void Stop(MotorPort motorPort)
-        {
-            if (motorPort == MotorPort.MotorA)
-                OutPortA.SetOutputState(0, Mode.Break, RegulationMode.Motor_On, (int)0, RunState.Running);
-            if (motorPort == MotorPort.MotorB)
-                OutPortB.SetOutputState(0, Mode.Break, RegulationMode.Motor_On, (int)0, RunState.Running);
-            if (motorPort == MotorPort.MotorC)
-                OutPortC.SetOutputState(0, Mode.Break, RegulationMode.Motor_On, (int)0, RunState.Running);
-            if (motorPort == MotorPort.MotorAll)
-            {
-                OutPortAll.SetOutputState(0, Mode.Break, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-                //OutPortB.SetOutputState(0, Mode.Break, RegulationMode.Motor_On, (int)0, RunState.Running);
-                //OutPortC.SetOutputState(0, Mode.Break, RegulationMode.Motor_On, (int)0, RunState.Running); 
-            }
-                
-        }
     }
 }

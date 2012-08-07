@@ -16,7 +16,7 @@ namespace Lego_Colour_Detection
         NXT.Robot NXT_Brick;
         string response = "";
 
-        
+
 
         public Form1()
         {
@@ -25,9 +25,15 @@ namespace Lego_Colour_Detection
 
         private void btn_Connect_Click(object sender, EventArgs e)
         {
-
-            // connect to the brick
-            NXT_Brick = new Robot(txt_PortName.Text);
+            try
+            {
+                NXT_Brick = new Robot(txt_PortName.Text);
+                // connect to the brick
+            }
+            catch
+            {
+                return;
+            }
             if (NXT_Brick.connected)
             {
                 btn_Connect.Enabled = false;
@@ -40,7 +46,7 @@ namespace Lego_Colour_Detection
                 btn_StartSound.Enabled = true;
                 btn_StartTone.Enabled = true;
                 btn_StopProg.Enabled = true;
-                btn_StopSound.Enabled = true;
+                btn_StopSound.Enabled = true; 
 
 
                 // load in device info
@@ -52,15 +58,12 @@ namespace Lego_Colour_Detection
                 txt_Protocol.Text = NXT_Brick.DeviceInfo.ProtocolVersion;
                 txt_Battery.Text = NXT_Brick.DirectCommands.GetBatteryLevel();
 
-               
-                timer1.Enabled = true;
+                timer1.Enabled = true; 
             }
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            NXT_Brick = null;
-
             cmb_Motor.Items.Clear();
             cmb_Motor.Items.AddRange(Enum.GetNames(typeof(NXT.MotorPort)));
             cmb_Motor.SelectedIndex = 0;
@@ -92,7 +95,7 @@ namespace Lego_Colour_Detection
             btn_StartSound.Enabled = false;
             btn_StartTone.Enabled = false;
             btn_StopProg.Enabled = false;
-            btn_StopSound.Enabled = false;
+            btn_StopSound.Enabled = false; 
 
 
             txt_Name.Text = "";
@@ -133,10 +136,10 @@ namespace Lego_Colour_Detection
 
         private void btn_MotorGet_Click(object sender, EventArgs e)
         {
+            string temp = "";
+            temp = NXT_Brick.OutPortA.GetOutputState();
 
-            
-
-            //MessageBox.Show(temp);
+            MessageBox.Show(temp);
         }
 
         private void label13_Click(object sender, EventArgs e)
@@ -146,23 +149,11 @@ namespace Lego_Colour_Detection
 
         private void btn_MotorSet_Click(object sender, EventArgs e)
         {
-            IDictionary<string, OutPort> selectedPort = new Dictionary<string, OutPort>
-            {
-                {"MotorA", NXT_Brick.OutPortA},
-                {"MotorB", NXT_Brick.OutPortB},
-                {"MotorC", NXT_Brick.OutPortC}
-            };
-
-            string key = cmb_Motor.SelectedItem.ToString();
-            if (selectedPort.ContainsKey(key))
-            {
-                selectedPort[key].SetOutputState((int)num_Speed.Value,
-                                               (NXT.Mode)Enum.Parse(typeof(NXT.Mode), cmb_Mode.SelectedItem.ToString()),
-                                               (NXT.RegulationMode)Enum.Parse(typeof(NXT.RegulationMode), cmb_RegMode.SelectedItem.ToString()),
-                                               (int)num_Turn.Value,
-                                               (NXT.RunState)Enum.Parse(typeof(NXT.RunState), cmb_RunState.SelectedItem.ToString()));
-            }
-
+            NXT_Brick.OutPortAll.SetOutputState(      (int)num_Speed.Value,
+                                                    (NXT.Mode)Enum.Parse(typeof(NXT.Mode), cmb_Mode.SelectedItem.ToString()),
+                                                    (NXT.RegulationMode)Enum.Parse(typeof(NXT.RegulationMode), cmb_RegMode.SelectedItem.ToString()),
+                                                    (int)num_Turn.Value,
+                                                    (NXT.RunState)Enum.Parse(typeof(NXT.RunState), cmb_RunState.SelectedItem.ToString()));
         }
 
         private void btn_StartSound_Click(object sender, EventArgs e)
@@ -172,12 +163,12 @@ namespace Lego_Colour_Detection
 
         private void btn_StartTone_Click(object sender, EventArgs e)
         {
-            NXT_Brick.DirectCommands.PlayTone((int)num_Freq.Value, (int)num_Duration.Value);
+            NXT_Brick.DirectCommands.PlayTone((int)num_Freq.Value, (int)num_Duration.Value); 
         }
 
         private void btn_StopSound_Click(object sender, EventArgs e)
         {
-            NXT_Brick.DirectCommands.StopSoundPlayback();
+            NXT_Brick.DirectCommands.StopSoundPlayback(); 
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -188,28 +179,23 @@ namespace Lego_Colour_Detection
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-
+            
         }
 
         private void btn_MotorReset_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(NXT_Brick.OutPortA.ResetMotorPosition(true));
-
+            MessageBox.Show(NXT_Brick.OutPortB.ResetMotorPosition(true));
+            
         }
 
         private void btn_SetName_Click(object sender, EventArgs e)
         {
-            NXT_Brick.DirectCommands.SetBrickName(txt_Name.Text);
+           NXT_Brick.DirectCommands.SetBrickName(txt_Name.Text);
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
 
-        }
-
-        private void button1_Click_2(object sender, EventArgs e)
-        {
-            NXT_Brick.GoBackwards(100);
         }
     }
 }

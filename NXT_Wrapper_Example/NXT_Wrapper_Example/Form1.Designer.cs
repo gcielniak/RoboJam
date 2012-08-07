@@ -574,6 +574,7 @@
             // 
             this.cmb_Motor.DisplayMember = "--Select--";
             this.cmb_Motor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmb_Motor.Enabled = false;
             this.cmb_Motor.FormattingEnabled = true;
             this.cmb_Motor.Items.AddRange(new object[] {
             "Motor A",
