@@ -45,3 +45,13 @@ C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapp
 C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Debug\NXT_Wrapper_Example.pdb
 C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapper_Example\bin\Debug\LSoCS.dll
 C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapper_Example\bin\Debug\LSoCS.pdb
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Debug\NXT_Wrapper_Example.exe
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Debug\NXT_Wrapper_Example.pdb
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\bin\Debug\NXT_Wrapper_Example.exe
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\bin\Debug\NXT_Wrapper_Example.pdb
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\bin\Debug\NXT.dll
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Debug\Lego_Colour_Detection.Form1.resources
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Debug\NXT_Wrapper_Example.Properties.Resources.resources
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Pete\Documents\GitHub\RoboJam\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Debug\GenerateResource.write.1.tlog
