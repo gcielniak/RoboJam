@@ -68,7 +68,6 @@
             this.label11 = new System.Windows.Forms.Label();
             this.cmb_RegMode = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.cmb_Mode = new System.Windows.Forms.ComboBox();
             this.label9 = new System.Windows.Forms.Label();
             this.num_Speed = new System.Windows.Forms.NumericUpDown();
             this.btn_MotorSet = new System.Windows.Forms.Button();
@@ -88,6 +87,7 @@
             this.btn_StartTone = new System.Windows.Forms.Button();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.cmb_Mode = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -498,19 +498,6 @@
             this.label10.TabIndex = 7;
             this.label10.Text = "Mode";
             // 
-            // cmb_Mode
-            // 
-            this.cmb_Mode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmb_Mode.FormattingEnabled = true;
-            this.cmb_Mode.Items.AddRange(new object[] {
-            "Break",
-            "On",
-            "Regulation"});
-            this.cmb_Mode.Location = new System.Drawing.Point(6, 93);
-            this.cmb_Mode.Name = "cmb_Mode";
-            this.cmb_Mode.Size = new System.Drawing.Size(90, 21);
-            this.cmb_Mode.TabIndex = 6;
-            // 
             // label9
             // 
             this.label9.AutoSize = true;
@@ -574,7 +561,6 @@
             // 
             this.cmb_Motor.DisplayMember = "--Select--";
             this.cmb_Motor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmb_Motor.Enabled = false;
             this.cmb_Motor.FormattingEnabled = true;
             this.cmb_Motor.Items.AddRange(new object[] {
             "Motor A",
@@ -734,6 +720,20 @@
             this.timer1.Interval = 60000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // cmb_Mode
+            // 
+            this.cmb_Mode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmb_Mode.FormattingEnabled = true;
+            this.cmb_Mode.Items.AddRange(new object[] {
+            "Break",
+            "On",
+            "Regulation"});
+            this.cmb_Mode.Location = new System.Drawing.Point(6, 93);
+            this.cmb_Mode.Name = "cmb_Mode";
+            this.cmb_Mode.Size = new System.Drawing.Size(90, 21);
+            this.cmb_Mode.TabIndex = 6;
+            this.cmb_Mode.SelectedIndexChanged += new System.EventHandler(this.cmb_Mode_SelectedIndexChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -805,7 +805,6 @@
         private System.Windows.Forms.Button btn_MotorReset;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.NumericUpDown num_Speed;
-        private System.Windows.Forms.ComboBox cmb_Mode;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.ComboBox cmb_RegMode;
@@ -833,6 +832,7 @@
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btn_SetName;
+        private System.Windows.Forms.ComboBox cmb_Mode;
     }
 }
 

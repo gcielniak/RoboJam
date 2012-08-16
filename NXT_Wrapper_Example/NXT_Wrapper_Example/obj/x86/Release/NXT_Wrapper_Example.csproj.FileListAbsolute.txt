@@ -7,3 +7,5 @@ C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapp
 C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Release\GenerateResource.write.1.tlog
 C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Release\NXT_Wrapper_Example.exe
 C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapper_Example\obj\x86\Release\NXT_Wrapper_Example.pdb
+C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapper_Example\bin\Release\NXT.dll
+C:\Users\Pete\Google Drive\2012\Robots\NXT\Wrapper\NXT_Wrapper_Example\NXT_Wrapper_Example\bin\Release\NXT.pdb

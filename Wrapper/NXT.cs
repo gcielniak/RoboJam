@@ -46,8 +46,12 @@ namespace NXT
     public enum Mode : byte
     {
         MotorOn = 0x01,     // Used to turn on specifid motor
-        Break = 0x07,       // Use run/break instead of run/float in PWN
-        Regulated = 0x04    // Turns on regulatoion
+        Break = 0x02,       // Use run/break instead of run/float in PWN
+        MotorOn_Break = 0x03, // use motoron + break
+        Regulated = 0x04,    // Turns on regulatoion
+        MotorOn_Regulated = 0x05, 
+        Break_Regulated = 0x06,
+        MotorOn_Break_Regulated = 0x07
     }
 
     public enum RegulationMode : byte
@@ -360,11 +364,12 @@ namespace NXT
         SensorMode mode;
         SensorType type;
 
-        public InPort(CSerialPort serial_port, byte port)
+        public InPort(CSerialPort serial_port, byte port, SensorType type = SensorType.Switch)
         {
             this.serial_port = serial_port;
             this.port = port;
             state = new byte[8];
+            Set(type, SensorMode.RawMode); 
         }
 
         public bool Set(SensorType type, SensorMode mode)
@@ -470,11 +475,11 @@ namespace NXT
             this.motor_port = motor_port;
         }
 
-        public string SetOutputState(int speed, Mode mode, RegulationMode regMode, int turnRatio, RunState runState)
+        public string SetOutputState(int speed, Mode mode = Mode.MotorOn, RegulationMode regMode = RegulationMode.Motor_On, int turnRatio = 0, RunState runState = RunState.Running, int tachoLimit =0)
         {
 
             byte[] message = new byte[13];  // message to be sent          
-
+            byte[] tacholimit = BitConverter.GetBytes(tachoLimit); 
             // Populate message
             message[0] = 0x00;                  // Feedback required
             message[1] = (byte)DirectCommand.SetOutputState;
@@ -486,13 +491,7 @@ namespace NXT
             message[7] = (byte)runState;        //run state
 
             //figure something out with this - make programmerable 
-            message[8] = 0x00;                      //tacho limit
-            message[9] = 0x00;
-            message[10] = 0x00;
-            message[11] = 0x00;
-            message[12] = 0x00;
-
-
+            tacholimit.CopyTo(message, 8);
 
             // Send message
             serial_port.Send(message, ref reply);
@@ -530,7 +529,7 @@ namespace NXT
             return returnMessage;
         }
 
-        public string ResetMotorPosition(bool AbsolutePosition)
+        public string ResetMotorPosition(bool AbsolutePosition = false)
         {
             byte[] message = new byte[4];
 
@@ -773,7 +772,7 @@ namespace NXT
             return returnMessage;
         }
 
-        public string PlaySoundFile(string name, bool loop)
+        public string PlaySoundFile(string name, bool loop = false)
         {
             /////////////////////////////
             // Function Description
@@ -914,8 +913,8 @@ namespace NXT
 
     public class Robot
     {
-        private string comPort;
-        CSerialPort serial_port;
+        protected string comPort;
+        protected CSerialPort serial_port;
         public CDeviceInfo DeviceInfo;
 
         // All inports of the NXT 1-4
@@ -936,7 +935,8 @@ namespace NXT
         public bool connected { get; protected set; }
 
 
-        public Details Info;
+        private Details Info;
+
         public Direct_Commands DirectCommands;
 
         public Robot(string ComPort)
@@ -956,16 +956,16 @@ namespace NXT
         /// </summary>
         /// <param name="port_name"></param>
         /// <returns></returns>
-        public bool Connect(string port_name)
+        private bool Connect(string port_name)
         {
             serial_port = new CSerialPort();
 
             DeviceInfo = new CDeviceInfo(serial_port);
 
-            InPort1 = new InPort(serial_port, 0);
-            InPort2 = new InPort(serial_port, 1);
-            InPort3 = new InPort(serial_port, 2);
-            InPort4 = new InPort(serial_port, 3);
+            InPort1 = new InPort(serial_port, 0, SensorType.Switch);
+            InPort2 = new InPort(serial_port, 1, SensorType.SoundDB);
+            InPort3 = new InPort(serial_port, 2, SensorType.LightActive);
+            InPort4 = new InPort(serial_port, 3, SensorType.Sonar);
 
             OutPortA = new OutPort(serial_port, MotorPort.MotorA);
             OutPortB = new OutPort(serial_port, MotorPort.MotorB);
@@ -982,7 +982,7 @@ namespace NXT
 
             if (!serial_port.Send(DirectCommand.KeepAlive))
             {
-                Disconnect();
+                NXTDisconnect();
                 return false;
             }
 
@@ -991,38 +991,30 @@ namespace NXT
         }
 
         /// <summary>
-        /// Will try and Automatical find the correct ComPort to connect to
-        /// </summary>
-        /// <returns></returns>
-        public bool AutoConnect()
-        {
-            foreach (string port_name in SerialPort.GetPortNames())
-                if (Connect(port_name))
-                    return true;
-
-            //another loop to fix problems with port names in the .NET library
-            foreach (string port_name in SerialPort.GetPortNames())
-                if (Connect(port_name.Substring(0, port_name.Length - 1)))
-                    return true;
-
-            return false;
-        }
-
-        /// <summary>
         /// Disconnect from ComPort
         /// </summary>
-        public void Disconnect()
+        public void NXTDisconnect()
         {
 
             serial_port.Disconnect();
             connected = false;
         }
 
+      
+    }
+
+    public class RobotExtended : Robot
+    {
+        public RobotExtended(string ComPort)
+            : base(ComPort)
+        {
+        }
+
         /// <summary>
         /// Move forward using ports B, C
         /// </summary>
         /// <param name="speed"></param>
-        public void GoForward(uint speed)
+        public void NXTGoForward(uint speed = 100)
         {
             speed = (speed > 100) ? 100 : speed;
 
@@ -1034,7 +1026,7 @@ namespace NXT
         /// Move backwards using ports B, C
         /// </summary>
         /// <param name="speed"></param>
-        public void GoBackwards(uint speed)
+        public void NXTGoBackwards(uint speed = 100)
         {
             OutPortB.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
             OutPortC.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
@@ -1045,7 +1037,7 @@ namespace NXT
         /// </summary>
         /// <param name="degrees"></param>
         /// <param name="speed"></param>
-        public void TurnRight(uint speed)
+        public void NXTTurnRight(uint speed = 100)
         {
             OutPortB.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
             OutPortC.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
@@ -1056,7 +1048,7 @@ namespace NXT
         /// </summary>
         /// <param name="degrees"></param>
         /// <param name="speed"></param>
-        public void TurnLeft(uint speed)
+        public void NXTTurnLeft(uint speed = 100)
         {
             OutPortB.SetOutputState(-(int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
             OutPortC.SetOutputState((int)speed, Mode.MotorOn, RegulationMode.Motor_Idle, (int)0, RunState.Running);
@@ -1065,7 +1057,7 @@ namespace NXT
         /// <summary>
         /// Stop the NXT from moving
         /// </summary>
-        public void Stop(MotorPort motorPort)
+        public void NXTStop(MotorPort motorPort = MotorPort.MotorAll)
         {
             if (motorPort == MotorPort.MotorA)
                 OutPortA.SetOutputState(0, Mode.Break, RegulationMode.Motor_On, (int)0, RunState.Running);
@@ -1076,10 +1068,48 @@ namespace NXT
             if (motorPort == MotorPort.MotorAll)
             {
                 OutPortAll.SetOutputState(0, Mode.Break, RegulationMode.Motor_Idle, (int)0, RunState.Running);
-                //OutPortB.SetOutputState(0, Mode.Break, RegulationMode.Motor_On, (int)0, RunState.Running);
-                //OutPortC.SetOutputState(0, Mode.Break, RegulationMode.Motor_On, (int)0, RunState.Running); 
             }
-                
+
+        }
+
+        /// <summary>
+        /// This can be used to make the NXT turn in any size cirle for 'x' amount of degrees 
+        /// </summary>
+        /// <param name="angle">desired turn angle</param>
+        /// <param name="toComplete">Run command till complete</param>
+        public void NXTSpotTurn(int angle, bool RuntoComplete = true)
+        {
+            double turnAngle = angle;   // desired turning angle 
+            const double cTurn = 528.0; // distance between wheel * PI 
+            const double cWheel = 176;  // circumference of wheels
+            double dct = 0; // distance to travel
+            double wheelRots = 0; // wheel rotations needed
+            int noOfDegree = 0; 
+
+            // work out the dct
+            dct = (cTurn * (turnAngle/360));
+
+            // work out wheel rotation needed to reach dct 
+            wheelRots = (dct / cWheel);
+
+            // workout degree
+            noOfDegree = (int)(360 * wheelRots);
+
+            // reset motor positions
+            OutPortB.ResetMotorPosition(true);
+            OutPortC.ResetMotorPosition(true);
+
+            OutPortB.SetOutputState(100, Mode.MotorOn,
+                                        RegulationMode.Motor_Idle,
+                                        0,
+                                        RunState.Running,
+                                        noOfDegree);
+            OutPortC.SetOutputState(-100, Mode.MotorOn,
+                                        RegulationMode.Motor_Idle,
+                                        0,
+                                        RunState.Running,
+                                        noOfDegree);
+        
         }
     }
 }
